@@ -1,12 +1,13 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define WIDTH 400
-#define HEIGHT 400
-#define CELL  (WIDTH/4)
+#define WIDTH 400  // largeur de la fenêtre
+#define HEIGHT 400   // hauteur de la fenêtre
+#define CELL  (WIDTH/4)  // taille d'une cellule
 
 void afficherGrille(int grille[4][4]) {
     for (int i = 0; i < 4; i++) {
@@ -130,14 +131,34 @@ SDL_Color colorForValue(int v) {
     return (SDL_Color){205,193,180,255};
 }
 
+void afficherTexte(SDL_Renderer* renderer, TTF_Font* font, int valeur, int x, int y) {
+    if (valeur == 0) return;
+    char texte[8];
+    sprintf(texte, "%d", valeur);
+
+    SDL_Color noir = {50, 50, 50, 255};
+    SDL_Surface* surface = TTF_RenderText_Blended(font, texte, noir);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_Rect rect = {x + CELL/2 - surface->w/2, y + CELL/2 - surface->h/2, surface->w, surface->h};
+    SDL_FreeSurface(surface);
+
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
+}
+
+
 int main() {
     srand((unsigned int)time(NULL));
     int grille[4][4]={0}, ancienne[4][4];
 
     if(SDL_Init(SDL_INIT_VIDEO)!=0){printf("Erreur SDL: %s\n",SDL_GetError());return 1;}
+    if(TTF_Init()!=0){printf("Erreur TTF: %s\n",TTF_GetError());return 1;}
 
     SDL_Window* window = SDL_CreateWindow("2048", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    TTF_Font* font = TTF_OpenFont("CHILLER.TTF", 40);
+    if(!font){printf("Erreur ouverture police: %s\n",TTF_GetError());return 1;}
 
     ajouterTuile(grille); ajouterTuile(grille);
 
@@ -168,6 +189,8 @@ int main() {
                 SDL_Rect rect={j*CELL+5,i*CELL+5,CELL-10,CELL-10};
                 SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
                 SDL_RenderFillRect(renderer,&rect);
+
+                afficherTexte(renderer, font, grille[i][j], j*CELL, i*CELL);
             }
         }
 
@@ -181,7 +204,8 @@ int main() {
         SDL_Delay(16);
     }
 
-
+    TTF_CloseFont(font);
+    TTF_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
