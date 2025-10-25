@@ -1,0 +1,3 @@
+D:/ECOLE/1ereAnneeEseo/C/Jeu_2048/cmake-build-debug/CMakeFiles/Jeu2048.dir
+D:/ECOLE/1ereAnneeEseo/C/Jeu_2048/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/ECOLE/1ereAnneeEseo/C/Jeu_2048/cmake-build-debug/CMakeFiles/rebuild_cache.dir
