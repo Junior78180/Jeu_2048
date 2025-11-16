@@ -83,7 +83,7 @@ void ajouterTuile(int grille[4][4]) {
     }
 }
 
-void deplacerGauche(int grille[4][4]) {
+void deplacerGauche(int grille[4][4], int updateScore) {
     for (int i = 0; i < 4; i++) {
         int temp[4] = {0}, pos = 0;
         for (int j = 0; j < 4; j++)
@@ -92,9 +92,11 @@ void deplacerGauche(int grille[4][4]) {
         for (int j = 0; j < 3; j++)
             if (temp[j] != 0 && temp[j] == temp[j + 1]) {
                 temp[j] *= 2;
-                score += temp[j];
+                if (updateScore) {
+                    score += temp[j];
+                    if (score > highscore) highscore = score;
+                }
                 temp[j + 1] = 0;
-                if (score > highscore) highscore = score;
             }
 
         int final[4] = {0};
@@ -106,22 +108,22 @@ void deplacerGauche(int grille[4][4]) {
     }
 }
 
-void deplacerDroite(int grille[4][4]) {
+void deplacerDroite(int grille[4][4], int updateScore) {
     for (int i = 0; i < 4; i++) inverserLigne(grille[i]);
-    deplacerGauche(grille);
+    deplacerGauche(grille, updateScore);
     for (int i = 0; i < 4; i++) inverserLigne(grille[i]);
 }
 
-void deplacerHaut(int grille[4][4]) {
+void deplacerHaut(int grille[4][4], int updateScore) {
     transposerGrille(grille);
-    deplacerGauche(grille);
+    deplacerGauche(grille, updateScore);
     transposerGrille(grille);
 }
 
-void deplacerBas(int grille[4][4]) {
+void deplacerBas(int grille[4][4], int updateScore) {
     transposerGrille(grille);
     for (int i = 0; i < 4; i++) inverserLigne(grille[i]);
-    deplacerGauche(grille);
+    deplacerGauche(grille, updateScore);
     for (int i = 0; i < 4; i++) inverserLigne(grille[i]);
     transposerGrille(grille);
 }
@@ -141,16 +143,16 @@ void copierGrille(int src[4][4], int dest[4][4]) {
 int mouvementPossible(int grille[4][4]) {
     int temp[4][4];
     copierGrille(grille, temp);
-    deplacerGauche(temp);
+    deplacerGauche(temp, 0);
     if (!grillesIdentiques(grille, temp)) return 1;
     copierGrille(grille, temp);
-    deplacerDroite(temp);
+    deplacerDroite(temp, 0);
     if (!grillesIdentiques(grille, temp)) return 1;
     copierGrille(grille, temp);
-    deplacerHaut(temp);
+    deplacerHaut(temp, 0);
     if (!grillesIdentiques(grille, temp)) return 1;
     copierGrille(grille, temp);
-    deplacerBas(temp);
+    deplacerBas(temp, 0);
     if (!grillesIdentiques(grille, temp)) return 1;
     return 0;
 }
@@ -254,10 +256,11 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
     int g[4][4] = {0}, old[4][4];
     chargerHighscore();
     score = 0;
-    char txtScore[32];
-    sprintf(txtScore, "Score: %d", score);
-    char txtHighscore[32];
-    sprintf(txtHighscore, "Highscore: %d", highscore);
+    int lastScore = highscore;
+    // char txtScore[32];
+    // sprintf(txtScore, "Score: %d", score);
+    // char txtHighscore[32];
+    // sprintf(txtHighscore, "Highscore: %d", highscore);
 
 
     ajouterTuile(g);
@@ -265,41 +268,58 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 
     int running = 1;
     SDL_Event e;
+    char txtScore[32];
+    char txtHighscore[32];
 
     while (running) {
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) return;
+            if (e.type == SDL_QUIT) {
+                if (highscore != lastScore)
+                    sauvegarderHighscore();
+                return;
+            }
             if (e.type == SDL_KEYDOWN) {
                 copierGrille(g, old);
                 switch (e.key.keysym.sym) {
-                    case SDLK_z: deplacerHaut(g);
-                        break;
-                    case SDLK_q: deplacerGauche(g);
-                        break;
-                    case SDLK_s: deplacerBas(g);
-                        break;
-                    case SDLK_d: deplacerDroite(g);
-                        break;
-                    case SDLK_x: return; // quitter la partie
+                    case SDLK_z: deplacerHaut(g, 1); break;
+                    case SDLK_q: deplacerGauche(g, 1); break;
+                    case SDLK_s: deplacerBas(g, 1); break;
+                    case SDLK_d: deplacerDroite(g, 1); break;
+                    case SDLK_x: if (highscore != lastScore)
+                        sauvegarderHighscore();
+                        return; // quitter la partie et sauvegarder le highscore
                 }
 
                 if (!grillesIdentiques(g, old)) ajouterTuile(g);
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 187, 173, 160, 255);
-        SDL_RenderClear(renderer);
+        // Mettre à jour le score à chaque déplacement
+        sprintf(txtScore, "Score: %d", score);
+        sprintf(txtHighscore, "Highscore: %d", highscore);
+
+        // Sauvegarder le highscore immédiatement si changé
+        if (highscore != lastScore) {
+            sauvegarderHighscore();
+            lastScore = highscore;
+        }
+
+        SDL_SetRenderDrawColor(renderer, 187, 173, 160, 255); // couleur de fond
+        SDL_RenderClear(renderer); // effacer l'écran
 
         afficherTexte(renderer, font, txtScore, WIDTH / 2, 30);
         afficherTexte(renderer, font, txtHighscore, WIDTH / 2, 80);
 
+        // dessiner la grille, les tuiles et les nombres
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                SDL_Color c = colorForValue(g[i][j]);
-                SDL_Rect r = {j * CELL + 5, i * CELL + 5 + 100,CELL - 10,CELL - 10};
-                SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-                SDL_RenderFillRect(renderer, &r);
+                // dessiner la case
+                SDL_Color c = colorForValue(g[i][j]); // obtenir la couleur selon la valeur
+                SDL_Rect r = {j * CELL + 5, i * CELL + 5 + 100,CELL - 10,CELL - 10}; // position et taille de la case
+                SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a); // définir la couleur
+                SDL_RenderFillRect(renderer, &r); // dessiner la case
 
+                // afficher le nombre dans la case
                 if (g[i][j] != 0) {
                     char txt[8];
                     sprintf(txt, "%d", g[i][j]);
@@ -307,16 +327,16 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
                 }
             }
         }
-
-        SDL_RenderPresent(renderer);
+        printf("Score: %d, Highscore: %d\n", score, highscore);
+        SDL_RenderPresent(renderer); // afficher le rendu
 
         if (!mouvementPossible(g)) {
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "2048", "Aucun mouvement possible",NULL);
+            if (highscore != lastScore) sauvegarderHighscore();
             return;
         }
 
         SDL_Delay(16);
-        sauvegarderHighscore();
     }
 }
 
