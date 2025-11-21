@@ -3,6 +3,7 @@
 #include <SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define WIDTH 400  // largeur de la fenêtre
@@ -181,6 +182,21 @@ void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, in
     SDL_DestroyTexture(texture);
 }
 
+void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y) {
+    if (!texte) return;
+    char *texteCopy = strdup(texte);
+    if (!texteCopy) return;
+    int ligneY = TTF_FontHeight(font);
+    int i = 0;
+    char *ligne = strtok(texteCopy, "\n");
+    while (ligne) {
+        afficherTexte(renderer, font, ligne, x, y + i * ligneY + 4); // 4px d'espacement entre les lignes
+        ligne = strtok(NULL, "\n");
+        i++;
+    }
+    free(texteCopy);
+}
+
 int clique(int mx, int my, SDL_Rect r) {
     return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
 }
@@ -216,10 +232,7 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
 
                 // bouton instructions
                 if (clique(mx, my, btnInstructions)) {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Instructions",
-                                             "Utilisez les touches Z (haut), Q (gauche), S (bas), D (droite) pour deplacer les tuiles.\n"
-                                             "Combinez les tuiles de meme valeur pour en creer de nouvelles et atteindre la tuile 2048 !\n"
-                                             "Appuyez sur X pour quitter la partie en cours.",NULL);
+                    return 0;
                 }
             }
         }
@@ -245,6 +258,68 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
         afficherTexte(r, font, "Quitter", 200, 290); // bouton quitter
 
         afficherTexte(r, font, "?", 200, 375); // bouton instructions
+
+        SDL_RenderPresent(r); // afficher le rendu
+
+        SDL_Delay(16); // ~60 FPS
+    }
+    return -1;
+}
+
+int instructions(SDL_Renderer * r, TTF_Font * font) {
+    int running = 1;
+    SDL_Event e;
+
+    SDL_Rect back = {175, 425, 50, 50};
+
+    TTF_Font *small = TTF_OpenFont("CHILLER.ttf", 26);
+    if (!small) {
+        printf("Erreur police : %s\n", TTF_GetError());
+        return -1;
+    }
+
+    const char *texte =
+        "Utilisez les touches :\n"
+        "Z (haut)\n"
+        "Q (gauche)\n"
+        "S (bas)\n"
+        "D (droite)\n\n"
+        "Combinez les tuiles de meme valeur !\n"
+        "Creez des nouvelles !\n"
+        "et atteignez la tuile 2048 !\n\n"
+        "Appuyez sur X pour quitter la partie en cours";
+
+    while (running) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) return -1;
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int mx = e.button.x, my = e.button.y;
+
+                // bouton instructions
+                if (clique(mx, my, back)) {
+                    // afficher les instructions
+                    TTF_CloseFont(small);
+                    return -1;
+
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(r, 230, 220, 210, 255); // couleur de fond
+        SDL_RenderClear(r); // effacer l'écran
+
+        SDL_SetRenderDrawColor(r, 180, 170, 160, 255); // couleur des boutons
+        // dessiner le bouton retour
+        SDL_RenderFillRect(r, &back);
+        afficherTexte(r, font, "X", 200, 450); // bouton retour
+
+        afficherTexte(r, font, "2048 en C", 200, 50); // titre
+
+        SDL_Rect fondTexte = {20, 120, 360, 280};
+        SDL_SetRenderDrawColor(r, 210, 200, 190, 255); // couleur du fond du texte
+        SDL_RenderFillRect(r, &fondTexte);
+        afficherTexte(r, font, "Instructions :", 200, 90); // bouton jouer
+        afficherTexteMultiligne(r, small, texte, 200, 130); // instructions
 
         SDL_RenderPresent(r); // afficher le rendu
 
@@ -327,7 +402,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
                 }
             }
         }
-        printf("Score: %d, Highscore: %d\n", score, highscore);
+        // printf("Score: %d, Highscore: %d\n", score, highscore);
         SDL_RenderPresent(renderer); // afficher le rendu
 
         if (!mouvementPossible(g)) {
@@ -359,6 +434,7 @@ int main() {
     while (1) {
         int choix = menu(renderer, font);
         if (choix == -1) break;
+        if (choix == 0) instructions(renderer, font);
         if (choix == 1) jouer(renderer, font);
     }
 
