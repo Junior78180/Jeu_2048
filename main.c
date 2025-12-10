@@ -9,6 +9,7 @@
 #define WIDTH 400  // largeur de la fenêtre
 #define HEIGHT 500   // hauteur de la fenêtre
 #define CELL  (WIDTH/4)  // taille d'une cellule
+#define STARS 150
 int difficulty = 0;
 int score = 0;
 int highscore = 0;
@@ -30,20 +31,41 @@ void sauvegarderHighscore() {
 }
 
 // ----------------------------------------------------
-// Fonctions à retirer plus tard (debug)
-void afficherGrille(int grille[4][4]) {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (grille[i][j] == 0)
-                printf("_\t");
-            else
-                printf("%d\t", grille[i][j]);
-        }
-        printf("\n");
+typedef struct {
+    float x, y;
+    float vitesse;
+    int taille;
+} Etoile;
+Etoile etoiles[STARS];
+
+void initialiserEtoiles() {
+    for (int i = 0; i < STARS; i++) {
+        etoiles[i].x = rand() % WIDTH;
+        etoiles[i].y = rand() % HEIGHT;
+        etoiles[i].vitesse = 0.5f + (rand() % 100) / 80.0f;
+        etoiles[i].taille = 1 + rand() % 2;
     }
-    printf("\n");
 }
 
+void dessinerEtoiles(SDL_Renderer *r) {
+    SDL_SetRenderDrawColor(r, 10, 10, 25, 255);
+    SDL_RenderClear(r);
+
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+
+    for (int i = 0; i < STARS; i++) {
+        SDL_Rect rect = { (int)etoiles[i].x, (int)etoiles[i].y, etoiles[i].taille, etoiles[i].taille };
+        SDL_RenderFillRect(r, &rect);
+        etoiles[i].y += etoiles[i].vitesse;
+        if (etoiles[i].y > HEIGHT) {
+            etoiles[i].x = rand() % WIDTH;
+            etoiles[i].y = 0;
+        }
+    }
+}
+
+// ----------------------------------------------------
+// Logique du jeu 2048
 void inverserLigne(int ligne[4]) {
     for (int i = 0; i < 2; i++) {
         int temp = ligne[i];
@@ -157,22 +179,24 @@ int mouvementPossible(int grille[4][4]) {
     if (!grillesIdentiques(grille, temp)) return 1;
     return 0;
 }
+// Fin logique du jeu 2048 ------------------------------
 
 SDL_Color colorForValue(int v) {
-    if (v == 1) return (SDL_Color){248, 238, 228, 255};
-    if (v == 2) return (SDL_Color){238, 228, 218, 255};
-    if (v == 4) return (SDL_Color){237, 224, 200, 255};
-    if (v == 8) return (SDL_Color){242, 177, 121, 255};
-    if (v == 16) return (SDL_Color){245, 149, 99, 255};
-    if (v == 32) return (SDL_Color){246, 124, 95, 255};
-    if (v == 64) return (SDL_Color){246, 94, 59, 255};
-    if (v > 64) return (SDL_Color){237, 207, 114, 255};
-    return (SDL_Color){205, 193, 180, 255};
+    if (v == 1)  return (SDL_Color){160, 150, 140, 255};
+    if (v == 2)  return (SDL_Color){150, 140, 130, 255};
+    if (v == 4)  return (SDL_Color){140, 120, 110, 255};
+    if (v == 8)  return (SDL_Color){150, 100, 70, 255};
+    if (v == 16) return (SDL_Color){160, 80, 60, 255};
+    if (v == 32) return (SDL_Color){170, 70, 55, 255};
+    if (v == 64) return (SDL_Color){170, 55, 40, 255};
+    if (v > 64)  return (SDL_Color){150, 130, 60, 255};
+    return (SDL_Color){110, 100, 90, 255};
 }
 
+
 void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y) {
-    SDL_Color noir = {50, 50, 50, 255};
-    SDL_Surface *surface = TTF_RenderText_Blended(font, texte, noir);
+    SDL_Color couleurTexte = {255, 255, 255, 255};
+    SDL_Surface *surface = TTF_RenderText_Blended(font, texte, couleurTexte);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     SDL_Rect rect = {x - surface->w / 2, y - surface->h / 2, surface->w, surface->h};
@@ -237,10 +261,9 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
             }
         }
 
-        SDL_SetRenderDrawColor(r, 230, 220, 210, 255); // couleur de fond
-        SDL_RenderClear(r); // effacer l'écran
+        dessinerEtoiles(r); // dessiner le fond étoilé
 
-        SDL_SetRenderDrawColor(r, 180, 170, 160, 255); // couleur des boutons
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 255); // couleur des boutons
 
         // dessiner les boutons
         SDL_RenderFillRect(r, &btnInstructions);
@@ -305,21 +328,17 @@ int instructions(SDL_Renderer * r, TTF_Font * font) {
             }
         }
 
-        SDL_SetRenderDrawColor(r, 230, 220, 210, 255); // couleur de fond
-        SDL_RenderClear(r); // effacer l'écran
-
-        SDL_SetRenderDrawColor(r, 180, 170, 160, 255); // couleur des boutons
-        // dessiner le bouton retour
-        SDL_RenderFillRect(r, &back);
-        afficherTexte(r, font, "X", 200, 450); // bouton retour
 
         afficherTexte(r, font, "2048 en C", 200, 50); // titre
 
-        SDL_Rect fondTexte = {20, 120, 360, 280};
-        SDL_SetRenderDrawColor(r, 210, 200, 190, 255); // couleur du fond du texte
-        SDL_RenderFillRect(r, &fondTexte);
+        dessinerEtoiles(r); // dessiner le fond étoilé
         afficherTexte(r, font, "Instructions :", 200, 90); // bouton jouer
         afficherTexteMultiligne(r, small, texte, 200, 130); // instructions
+
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 255); // couleur des boutons
+        // dessiner le bouton retour
+        SDL_RenderFillRect(r, &back);
+        afficherTexte(r, font, "X", 200, 450); // bouton retour
 
         SDL_RenderPresent(r); // afficher le rendu
 
@@ -379,8 +398,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
             lastScore = highscore;
         }
 
-        SDL_SetRenderDrawColor(renderer, 187, 173, 160, 255); // couleur de fond
-        SDL_RenderClear(renderer); // effacer l'écran
+        dessinerEtoiles(renderer); // dessiner le fond étoilé
 
         afficherTexte(renderer, font, txtScore, WIDTH / 2, 30);
         afficherTexte(renderer, font, txtHighscore, WIDTH / 2, 80);
@@ -420,6 +438,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 int main() {
     srand((unsigned) time(NULL));
     SDL_Init(SDL_INIT_VIDEO);
+    initialiserEtoiles();
     TTF_Init();
 
     SDL_Window *window = SDL_CreateWindow("2048",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,WIDTH,HEIGHT, 0);
