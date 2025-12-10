@@ -182,15 +182,15 @@ int mouvementPossible(int grille[4][4]) {
 // Fin logique du jeu 2048 ------------------------------
 
 SDL_Color colorForValue(int v) {
-    if (v == 1)  return (SDL_Color){160, 150, 140, 255};
-    if (v == 2)  return (SDL_Color){150, 140, 130, 255};
-    if (v == 4)  return (SDL_Color){140, 120, 110, 255};
-    if (v == 8)  return (SDL_Color){150, 100, 70, 255};
-    if (v == 16) return (SDL_Color){160, 80, 60, 255};
-    if (v == 32) return (SDL_Color){170, 70, 55, 255};
-    if (v == 64) return (SDL_Color){170, 55, 40, 255};
-    if (v > 64)  return (SDL_Color){150, 130, 60, 255};
-    return (SDL_Color){110, 100, 90, 255};
+    if (v == 1)  return (SDL_Color){160, 150, 140, 200};
+    if (v == 2)  return (SDL_Color){150, 140, 130, 200};
+    if (v == 4)  return (SDL_Color){140, 120, 110, 200};
+    if (v == 8)  return (SDL_Color){150, 100, 70, 200};
+    if (v == 16) return (SDL_Color){160, 80, 60, 200};
+    if (v == 32) return (SDL_Color){170, 70, 55, 200};
+    if (v == 64) return (SDL_Color){170, 55, 40, 200};
+    if (v > 64)  return (SDL_Color){150, 130, 60, 200};
+    return (SDL_Color){110, 100, 90, 50};
 }
 
 
@@ -443,6 +443,8 @@ int main() {
 
     SDL_Window *window = SDL_CreateWindow("2048",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,WIDTH,HEIGHT, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     TTF_Font *font = TTF_OpenFont("CHILLER.TTF", 40);
     if (!font) {
