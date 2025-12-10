@@ -263,7 +263,7 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
 
         dessinerEtoiles(r); // dessiner le fond étoilé
 
-        SDL_SetRenderDrawColor(r, 50, 50, 50, 255); // couleur des boutons
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 150); // couleur des boutons
 
         // dessiner les boutons
         SDL_RenderFillRect(r, &btnInstructions);
@@ -293,6 +293,7 @@ int instructions(SDL_Renderer * r, TTF_Font * font) {
     int running = 1;
     SDL_Event e;
 
+    SDL_Rect fondTexteInstruction = {20, 120, 360, 280};
     SDL_Rect back = {175, 425, 50, 50};
 
     TTF_Font *small = TTF_OpenFont("CHILLER.ttf", 26);
@@ -334,8 +335,11 @@ int instructions(SDL_Renderer * r, TTF_Font * font) {
         dessinerEtoiles(r); // dessiner le fond étoilé
         afficherTexte(r, font, "Instructions :", 200, 90); // bouton jouer
         afficherTexteMultiligne(r, small, texte, 200, 130); // instructions
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 50); // couleur du fond des instructions
+        SDL_RenderFillRect(r, &fondTexteInstruction);
 
-        SDL_SetRenderDrawColor(r, 50, 50, 50, 255); // couleur des boutons
+
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 150); // couleur des boutons
         // dessiner le bouton retour
         SDL_RenderFillRect(r, &back);
         afficherTexte(r, font, "X", 200, 450); // bouton retour
