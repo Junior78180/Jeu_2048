@@ -53,7 +53,7 @@ build CMakeFiles/Jeu2048.dir/main.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:
   CONFIG = Debug
   DEP_FILE = CMakeFiles\Jeu2048.dir\main.c.obj.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
-  INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2
+  INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
   OBJECT_DIR = CMakeFiles\Jeu2048.dir
   OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir
 
@@ -68,8 +68,8 @@ build CMakeFiles/Jeu2048.dir/main.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:
 build Jeu2048.exe: C_EXECUTABLE_LINKER__Jeu2048_Debug CMakeFiles/Jeu2048.dir/main.c.obj
   CONFIG = Debug
   FLAGS = -g
-  LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_ttf  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  LINK_PATH = -LC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/lib   -LC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/lib
+  LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_ttf  -lSDL2_mixer  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_PATH = -LC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/lib   -LC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/lib   -LC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/lib
   OBJECT_DIR = CMakeFiles\Jeu2048.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,11 +32,15 @@ void sauvegarderHighscore() {
 }
 
 // ----------------------------------------------------
+
+
+// Fond étoilé
 typedef struct {
     float x, y;
     float vitesse;
     int taille;
 } Etoile;
+
 Etoile etoiles[STARS];
 
 void initialiserEtoiles() {
@@ -54,7 +59,7 @@ void dessinerEtoiles(SDL_Renderer *r) {
     SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
 
     for (int i = 0; i < STARS; i++) {
-        SDL_Rect rect = { (int)etoiles[i].x, (int)etoiles[i].y, etoiles[i].taille, etoiles[i].taille };
+        SDL_Rect rect = {(int) etoiles[i].x, (int) etoiles[i].y, etoiles[i].taille, etoiles[i].taille};
         SDL_RenderFillRect(r, &rect);
         etoiles[i].y += etoiles[i].vitesse;
         if (etoiles[i].y > HEIGHT) {
@@ -179,17 +184,18 @@ int mouvementPossible(int grille[4][4]) {
     if (!grillesIdentiques(grille, temp)) return 1;
     return 0;
 }
+
 // Fin logique du jeu 2048 ------------------------------
 
 SDL_Color colorForValue(int v) {
-    if (v == 1)  return (SDL_Color){160, 150, 140, 200};
-    if (v == 2)  return (SDL_Color){150, 140, 130, 200};
-    if (v == 4)  return (SDL_Color){140, 120, 110, 200};
-    if (v == 8)  return (SDL_Color){150, 100, 70, 200};
+    if (v == 1) return (SDL_Color){160, 150, 140, 200};
+    if (v == 2) return (SDL_Color){150, 140, 130, 200};
+    if (v == 4) return (SDL_Color){140, 120, 110, 200};
+    if (v == 8) return (SDL_Color){150, 100, 70, 200};
     if (v == 16) return (SDL_Color){160, 80, 60, 200};
     if (v == 32) return (SDL_Color){170, 70, 55, 200};
     if (v == 64) return (SDL_Color){170, 55, 40, 200};
-    if (v > 64)  return (SDL_Color){150, 130, 60, 200};
+    if (v > 64) return (SDL_Color){150, 130, 60, 200};
     return (SDL_Color){110, 100, 90, 50};
 }
 
@@ -289,7 +295,7 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
     return -1;
 }
 
-int instructions(SDL_Renderer * r, TTF_Font * font) {
+int instructions(SDL_Renderer *r, TTF_Font *font) {
     int running = 1;
     SDL_Event e;
 
@@ -303,15 +309,15 @@ int instructions(SDL_Renderer * r, TTF_Font * font) {
     }
 
     const char *texte =
-        "Utilisez les touches :\n"
-        "Z (haut)\n"
-        "Q (gauche)\n"
-        "S (bas)\n"
-        "D (droite)\n\n"
-        "Combinez les tuiles de meme valeur !\n"
-        "Creez des nouvelles !\n"
-        "et atteignez la tuile 2048 !\n\n"
-        "Appuyez sur X pour quitter la partie en cours";
+            "Utilisez les touches :\n"
+            "Z (haut)\n"
+            "Q (gauche)\n"
+            "S (bas)\n"
+            "D (droite)\n\n"
+            "Combinez les tuiles de meme valeur !\n"
+            "Creez des nouvelles !\n"
+            "et atteignez la tuile 2048 !\n\n"
+            "Appuyez sur X pour quitter la partie en cours";
 
     while (running) {
         while (SDL_PollEvent(&e)) {
@@ -324,7 +330,6 @@ int instructions(SDL_Renderer * r, TTF_Font * font) {
                     // afficher les instructions
                     TTF_CloseFont(small);
                     return -1;
-
                 }
             }
         }
@@ -379,12 +384,16 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
             if (e.type == SDL_KEYDOWN) {
                 copierGrille(g, old);
                 switch (e.key.keysym.sym) {
-                    case SDLK_z: deplacerHaut(g, 1); break;
-                    case SDLK_q: deplacerGauche(g, 1); break;
-                    case SDLK_s: deplacerBas(g, 1); break;
-                    case SDLK_d: deplacerDroite(g, 1); break;
+                    case SDLK_z: deplacerHaut(g, 1);
+                        break;
+                    case SDLK_q: deplacerGauche(g, 1);
+                        break;
+                    case SDLK_s: deplacerBas(g, 1);
+                        break;
+                    case SDLK_d: deplacerDroite(g, 1);
+                        break;
                     case SDLK_x: if (highscore != lastScore)
-                        sauvegarderHighscore();
+                            sauvegarderHighscore();
                         return; // quitter la partie et sauvegarder le highscore
                 }
 
@@ -456,6 +465,18 @@ int main() {
         return 1;
     }
 
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("Erreur Mix_OpenAudio: %s\n", Mix_GetError());
+        return 1;
+    }
+
+    Mix_Music *musique = Mix_LoadMUS("musics/Interstellar_Main_Theme_Extra_Extended_Soundtrack_by_Hans_Zimmer.mp3");
+    if (!musique) {
+        printf("Erreur de chargement de la musique: %s\n", Mix_GetError());
+    } else {
+        Mix_PlayMusic(musique, -1); // jouer en boucle
+    }
+
     while (1) {
         int choix = menu(renderer, font);
         if (choix == -1) break;
@@ -463,6 +484,9 @@ int main() {
         if (choix == 1) jouer(renderer, font);
     }
 
+
+    Mix_FreeMusic(musique);
+    Mix_CloseAudio();
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
