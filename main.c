@@ -66,11 +66,11 @@ void initialiserPlanetes() {
     for (int i = 0; i < PLANETES; i++) {
         planetes[i].x = rand() % WIDTH;
         planetes[i].y = rand() % HEIGHT;
-        planetes[i].vitesse = 0.1f + (rand() % 100) / 200.0f;
+        planetes[i].vitesse = 0.1f + (rand() % 150) / 200.0f;
         planetes[i].taille = 12 + rand() % 18;
 
         // Couleur
-        planetes[i].couleur.r = 150 + rand() % 10;
+        planetes[i].couleur.r = 120 + rand() % 5;
         planetes[i].couleur.g = 80 + rand() % 120;
         planetes[i].couleur.b = 150 + rand() % 150;
         planetes[i].couleur.a = 180;
