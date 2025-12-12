@@ -6,11 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #define WIDTH 400  // largeur de la fenêtre
 #define HEIGHT 500   // hauteur de la fenêtre
 #define CELL  (WIDTH/4)  // taille d'une cellule
 #define STARS 150
+#define PLANETES 5
 int difficulty = 0;
 int score = 0;
 int highscore = 0;
@@ -41,16 +43,83 @@ typedef struct {
     int taille;
 } Etoile;
 
+typedef struct {
+    float x, y;
+    float vitesse;
+    int taille;
+    SDL_Color couleur;
+} Planete;
+
 Etoile etoiles[STARS];
+Planete planetes[PLANETES];
 
 void initialiserEtoiles() {
     for (int i = 0; i < STARS; i++) {
         etoiles[i].x = rand() % WIDTH;
         etoiles[i].y = rand() % HEIGHT;
-        etoiles[i].vitesse = 0.5f + (rand() % 100) / 80.0f;
+        etoiles[i].vitesse = 0.5f + (rand() % 10) / 80.0f;
         etoiles[i].taille = 1 + rand() % 2;
     }
 }
+
+void initialiserPlanetes() {
+    for (int i = 0; i < PLANETES; i++) {
+        planetes[i].x = rand() % WIDTH;
+        planetes[i].y = rand() % HEIGHT;
+        planetes[i].vitesse = 0.1f + (rand() % 100) / 200.0f;
+        planetes[i].taille = 12 + rand() % 18;
+
+        // Couleur
+        planetes[i].couleur.r = 150 + rand() % 10;
+        planetes[i].couleur.g = 80 + rand() % 120;
+        planetes[i].couleur.b = 150 + rand() % 150;
+        planetes[i].couleur.a = 180;
+    }
+}
+
+void RemplirCercle(SDL_Renderer *r, int cx, int cy, int radius, SDL_Color color) {
+    SDL_SetRenderDrawColor(r, color.r, color.g, color.b, color.a);
+
+    for (int dy = -radius; dy <= radius; dy++) {
+        int dxMax = (int) sqrt(radius * radius - dy * dy);
+        SDL_RenderDrawLine(r, cx - dxMax, cy + dy, cx + dxMax, cy + dy);
+    }
+}
+
+void drawPlanetGradient(SDL_Renderer *r, int cx, int cy, int radius, SDL_Color baseColor) {
+    for (int i = 0; i < radius; i++) {
+        float t = (float) i / radius;
+
+        SDL_Color c = {
+            (Uint8) (baseColor.r * (1.0f - 0.5f * t)),
+            (Uint8) (baseColor.g * (1.0f - 0.5f * t)),
+            (Uint8) (baseColor.b * (1.0f - 0.5f * t)),
+            20
+        };
+
+        RemplirCercle(r, cx, cy, radius - i, c);
+    }
+}
+
+
+void dessinerPlanetes(SDL_Renderer *r) {
+    for (int i = 0; i < PLANETES; i++) {
+        int cx = (int) planetes[i].x;
+        int cy = (int) planetes[i].y;
+        int rad = planetes[i].taille;
+
+        // Dégradé (base sombre)
+        drawPlanetGradient(r, cx, cy, rad, planetes[i].couleur);
+
+        // Animation verticale
+        planetes[i].y += planetes[i].vitesse;
+        if (planetes[i].y > HEIGHT + rad) {
+            planetes[i].x = rand() % WIDTH;
+            planetes[i].y = -rad - 10;
+        }
+    }
+}
+
 
 void dessinerEtoiles(SDL_Renderer *r) {
     SDL_SetRenderDrawColor(r, 10, 10, 25, 255);
@@ -268,6 +337,7 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
         }
 
         dessinerEtoiles(r); // dessiner le fond étoilé
+        dessinerPlanetes(r);
 
         SDL_SetRenderDrawColor(r, 50, 50, 50, 150); // couleur des boutons
 
@@ -338,6 +408,7 @@ int instructions(SDL_Renderer *r, TTF_Font *font) {
         afficherTexte(r, font, "2048 en C", 200, 50); // titre
 
         dessinerEtoiles(r); // dessiner le fond étoilé
+        dessinerPlanetes(r);
         afficherTexte(r, font, "Instructions :", 200, 90); // bouton jouer
         afficherTexteMultiligne(r, small, texte, 200, 130); // instructions
         SDL_SetRenderDrawColor(r, 50, 50, 50, 50); // couleur du fond des instructions
@@ -412,6 +483,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
         }
 
         dessinerEtoiles(renderer); // dessiner le fond étoilé
+        dessinerPlanetes(renderer);
 
         afficherTexte(renderer, font, txtScore, WIDTH / 2, 30);
         afficherTexte(renderer, font, txtHighscore, WIDTH / 2, 80);
@@ -452,6 +524,7 @@ int main() {
     srand((unsigned) time(NULL));
     SDL_Init(SDL_INIT_VIDEO);
     initialiserEtoiles();
+    initialiserPlanetes();
     TTF_Init();
 
     SDL_Window *window = SDL_CreateWindow("2048",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,WIDTH,HEIGHT, 0);
