@@ -10,7 +10,14 @@ include_directories(${CMAKE_SOURCE_DIR}/SDL2_ttf/x86_64-w64-mingw32/include/SDL2
 link_directories(${CMAKE_SOURCE_DIR}/SDL2_ttf/x86_64-w64-mingw32/lib)
 include_directories(${CMAKE_SOURCE_DIR}/SDL2_mixer/x86_64-w64-mingw32/include/SDL2)
 link_directories(${CMAKE_SOURCE_DIR}/SDL2_mixer/x86_64-w64-mingw32/lib)
-add_executable(Jeu2048 main.c)
-
+add_executable(Jeu2048 src/main.c
+        src/config.h
+        src/game.c
+        src/game.h
+        src/menu.c
+        src/menu.h
+        src/render.c
+        src/render.h
+)
 # Linker SDL2
 target_link_libraries(Jeu2048 mingw32 SDL2main SDL2 SDL2_ttf SDL2_mixer)

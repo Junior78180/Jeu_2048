@@ -139,6 +139,7 @@ void dessinerEtoiles(SDL_Renderer *r) {
 }
 
 // ----------------------------------------------------
+
 // Logique du jeu 2048
 void inverserLigne(int ligne[4]) {
     for (int i = 0; i < 2; i++) {
@@ -424,6 +425,7 @@ int instructions(SDL_Renderer *r, TTF_Font *font) {
 
         SDL_Delay(16); // ~60 FPS
     }
+    return -1;
 }
 
 void jouer(SDL_Renderer *renderer, TTF_Font *font) {
@@ -431,11 +433,6 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
     chargerHighscore();
     score = 0;
     int lastScore = highscore;
-    // char txtScore[32];
-    // sprintf(txtScore, "Score: %d", score);
-    // char txtHighscore[32];
-    // sprintf(txtHighscore, "Highscore: %d", highscore);
-
 
     ajouterTuile(g);
     ajouterTuile(g);

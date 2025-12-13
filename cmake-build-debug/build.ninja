@@ -49,13 +49,37 @@ cmake_ninja_workdir = C$:/Users/alexi/CLionProjects/Jeu_2048/cmake-build-debug/
 
 build cmake_object_order_depends_target_Jeu2048: phony || .
 
-build CMakeFiles/Jeu2048.dir/main.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:/Users/alexi/CLionProjects/Jeu_2048/main.c || cmake_object_order_depends_target_Jeu2048
+build CMakeFiles/Jeu2048.dir/src/main.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:/Users/alexi/CLionProjects/Jeu_2048/src/main.c || cmake_object_order_depends_target_Jeu2048
   CONFIG = Debug
-  DEP_FILE = CMakeFiles\Jeu2048.dir\main.c.obj.d
+  DEP_FILE = CMakeFiles\Jeu2048.dir\src\main.c.obj.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
   OBJECT_DIR = CMakeFiles\Jeu2048.dir
-  OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir
+  OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir\src
+
+build CMakeFiles/Jeu2048.dir/src/game.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:/Users/alexi/CLionProjects/Jeu_2048/src/game.c || cmake_object_order_depends_target_Jeu2048
+  CONFIG = Debug
+  DEP_FILE = CMakeFiles\Jeu2048.dir\src\game.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
+  OBJECT_DIR = CMakeFiles\Jeu2048.dir
+  OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir\src
+
+build CMakeFiles/Jeu2048.dir/src/menu.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:/Users/alexi/CLionProjects/Jeu_2048/src/menu.c || cmake_object_order_depends_target_Jeu2048
+  CONFIG = Debug
+  DEP_FILE = CMakeFiles\Jeu2048.dir\src\menu.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
+  OBJECT_DIR = CMakeFiles\Jeu2048.dir
+  OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir\src
+
+build CMakeFiles/Jeu2048.dir/src/render.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:/Users/alexi/CLionProjects/Jeu_2048/src/render.c || cmake_object_order_depends_target_Jeu2048
+  CONFIG = Debug
+  DEP_FILE = CMakeFiles\Jeu2048.dir\src\render.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_ttf/x86_64-w64-mingw32/include/SDL2 -IC:/Users/alexi/CLionProjects/Jeu_2048/SDL2_mixer/x86_64-w64-mingw32/include/SDL2
+  OBJECT_DIR = CMakeFiles\Jeu2048.dir
+  OBJECT_FILE_DIR = CMakeFiles\Jeu2048.dir\src
 
 
 # =============================================================================
@@ -65,7 +89,7 @@ build CMakeFiles/Jeu2048.dir/main.c.obj: C_COMPILER__Jeu2048_unscanned_Debug C$:
 #############################################
 # Link the executable Jeu2048.exe
 
-build Jeu2048.exe: C_EXECUTABLE_LINKER__Jeu2048_Debug CMakeFiles/Jeu2048.dir/main.c.obj
+build Jeu2048.exe: C_EXECUTABLE_LINKER__Jeu2048_Debug CMakeFiles/Jeu2048.dir/src/main.c.obj CMakeFiles/Jeu2048.dir/src/game.c.obj CMakeFiles/Jeu2048.dir/src/menu.c.obj CMakeFiles/Jeu2048.dir/src/render.c.obj
   CONFIG = Debug
   FLAGS = -g
   LINK_LIBRARIES = -lmingw32  -lSDL2main  -lSDL2  -lSDL2_ttf  -lSDL2_mixer  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
