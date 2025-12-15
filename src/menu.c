@@ -5,6 +5,15 @@
 #include <string.h>
 
 int menu(SDL_Renderer *r, TTF_Font *font) {
+    /*
+     * Affichage graphique du menu principal de l'application
+     * Permet de choisir différentes options comme jouer, changer la difficulté, quitter ou afficher les instructions
+     * Retourne un entier correspondant au choix de l'utilisateur :
+     *  1 : Jouer
+     *  changement de difficulté (0: facile, 1: difficile) pour la variable globale 'difficulty'
+     *  0 : Instructions
+     * -1 : Quitter
+     */
     int running = 1;
     SDL_Event e;
 
@@ -15,6 +24,9 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
 
     while (running) {
         while (SDL_PollEvent(&e)) {
+            /*
+             * Gestion des événements SDL
+             */
             if (e.type == SDL_QUIT) return -1;
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int mx = e.button.x, my = e.button.y;
@@ -48,6 +60,10 @@ int menu(SDL_Renderer *r, TTF_Font *font) {
 }
 
 int instructions(SDL_Renderer *r, TTF_Font *font) {
+    /*
+     * Affichage graphique des instructions du jeu
+     * Permet à l'utilisateur de lire les instructions et de revenir au menu principal
+     */
     int running = 1;
     SDL_Event e;
     SDL_Rect fondTexteInstruction = {20, 120, 360, 280};
@@ -96,6 +112,9 @@ int instructions(SDL_Renderer *r, TTF_Font *font) {
 }
 
 void jouer(SDL_Renderer *renderer, TTF_Font *font) {
+    /*
+     * Affichage graphique de la partie en cours
+     */
     int g[4][4] = {0}, old[4][4];
     chargerHighscore();
     score = 0;

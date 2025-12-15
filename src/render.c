@@ -7,6 +7,9 @@ static Etoile etoiles[STARS];
 static Planete planetes[PLANETES];
 
 void initialiserEtoiles() {
+    /*
+     * Initialisation des étoiles avec des positions, vitesses et tailles aléatoires
+     */
     for (int i = 0; i < STARS; i++) {
         etoiles[i].x = rand() % WIDTH;
         etoiles[i].y = rand() % HEIGHT;
@@ -16,6 +19,9 @@ void initialiserEtoiles() {
 }
 
 void initialiserPlanetes() {
+    /*
+     * Initialisation des planètes avec des positions, vitesses, tailles et couleurs aléatoires
+     */
     for (int i = 0; i < PLANETES; i++) {
         planetes[i].x = rand() % WIDTH;
         planetes[i].y = rand() % HEIGHT;
@@ -29,6 +35,9 @@ void initialiserPlanetes() {
 }
 
 void RemplirCercle(SDL_Renderer *r, int cx, int cy, int radius, SDL_Color color) {
+    /*
+     * Remplit un cercle de centre (cx, cy) et de rayon 'radius' avec la couleur 'color'
+     */
     SDL_SetRenderDrawColor(r, color.r, color.g, color.b, color.a);
     for (int dy = -radius; dy <= radius; dy++) {
         int dxMax = (int) sqrt(radius * radius - dy * dy);
@@ -37,6 +46,9 @@ void RemplirCercle(SDL_Renderer *r, int cx, int cy, int radius, SDL_Color color)
 }
 
 void dessinerPlanetes(SDL_Renderer *r) {
+    /*
+     * Dessine les planètes avec un effet de dégradé et les fait descendre
+     */
     for (int i = 0; i < PLANETES; i++) {
         int cx = (int) planetes[i].x;
         int cy = (int) planetes[i].y;
@@ -60,6 +72,9 @@ void dessinerPlanetes(SDL_Renderer *r) {
 }
 
 void dessinerEtoiles(SDL_Renderer *r) {
+    /*
+     * Dessine les étoiles et les fait descendre
+     */
     SDL_SetRenderDrawColor(r, 10, 10, 25, 255);
     SDL_RenderClear(r);
     SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
@@ -75,6 +90,9 @@ void dessinerEtoiles(SDL_Renderer *r) {
 }
 
 SDL_Color colorForValue(int v) {
+    /*
+     * Définit la couleur en fonction de la valeur de la tuile
+     */
     if (v == 1) return (SDL_Color){160, 150, 140, 200};
     if (v == 2) return (SDL_Color){150, 140, 130, 200};
     if (v == 4) return (SDL_Color){140, 120, 110, 200};
@@ -87,6 +105,9 @@ SDL_Color colorForValue(int v) {
 }
 
 void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y) {
+    /*
+     * Affiche le texte centré en (x, y)
+     */
     if (!texte || !font) return;
     SDL_Color couleurTexte = {255, 255, 255, 255};
     SDL_Surface *surface = TTF_RenderText_Blended(font, texte, couleurTexte);
@@ -101,6 +122,9 @@ void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, in
 }
 
 void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y) {
+    /*
+     * Affiche le texte multiligne en commençant en (x, y)
+     */
     if (!texte) return;
     char *texteCopy = strdup(texte);
     if (!texteCopy) return;
@@ -116,5 +140,8 @@ void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char 
 }
 
 int clique(int mx, int my, SDL_Rect r) {
+    /*
+     * Retourne 1 si le clic (mx, my) est dans le rectangle r, sinon 0
+     */
     return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
 }

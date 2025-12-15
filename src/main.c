@@ -11,6 +11,12 @@
 #include "menu.h"
 
 int main() {
+    /*
+     * Point d'entrée principal de l'application
+     * Initialise SDL, la fenêtre, le rendu, la police et l'audio
+     * Gère la boucle principale du menu et des instructions
+     * Nettoie les ressources avant de quitter
+     */
     srand((unsigned) time(NULL));
     initialiserEtoiles();
     initialiserPlanetes();
