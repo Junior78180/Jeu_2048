@@ -18,6 +18,5 @@ void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, in
 void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y);
 SDL_Color colorForValue(int v);
 int clique(int mx, int my, SDL_Rect r);
-void dessinerGrille(SDL_Renderer *renderer, TTF_Font *font, int grille[4][4], int offsetX, int offsetY);
 
 #endif // RENDER_H
