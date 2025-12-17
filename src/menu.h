@@ -7,5 +7,6 @@
 int menu(SDL_Renderer *r, TTF_Font *font);
 int instructions(SDL_Renderer *r, TTF_Font *font);
 void jouer(SDL_Renderer *renderer, TTF_Font *font);
+int gameOver(SDL_Renderer *renderer, TTF_Font *font);
 
 #endif

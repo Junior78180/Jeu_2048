@@ -115,12 +115,12 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
     /*
      * Affichage graphique de la partie en cours
      */
-    int g[4][4] = {0}, old[4][4];
+    int grille[4][4] = {0}, old[4][4];
     chargerHighscore();
     score = 0;
     int lastScore = highscore;
-    ajouterTuile(g);
-    ajouterTuile(g);
+    ajouterTuile(grille);
+    ajouterTuile(grille);
 
     int running = 1;
     SDL_Event e;
@@ -134,17 +134,17 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
                 return;
             }
             if (e.type == SDL_KEYDOWN) {
-                copierGrille(g, old);
+                copierGrille(grille, old);
                 switch (e.key.keysym.sym) {
-                    case SDLK_z: deplacerHaut(g, 1); break;
-                    case SDLK_q: deplacerGauche(g, 1); break;
-                    case SDLK_s: deplacerBas(g, 1); break;
-                    case SDLK_d: deplacerDroite(g, 1); break;
+                    case SDLK_z: deplacerHaut(grille, 1); break;
+                    case SDLK_q: deplacerGauche(grille, 1); break;
+                    case SDLK_s: deplacerBas(grille, 1); break;
+                    case SDLK_d: deplacerDroite(grille, 1); break;
                     case SDLK_x:
                         if (highscore != lastScore) sauvegarderHighscore();
                         return;
                 }
-                if (memcmp(g, old, sizeof g) != 0) ajouterTuile(g);
+                if (memcmp(grille, old, sizeof grille) != 0) ajouterTuile(grille); //
             }
         }
 
@@ -160,13 +160,13 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                SDL_Color c = colorForValue(g[i][j]);
+                SDL_Color c = colorForValue(grille[i][j]);
                 SDL_Rect r = {j * CELL + 5, i * CELL + 5 + 100, CELL - 10, CELL - 10};
                 SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
                 SDL_RenderFillRect(renderer, &r);
-                if (g[i][j] != 0) {
+                if (grille[i][j] != 0) {
                     char txt[16];
-                    sprintf(txt, "%d", g[i][j]);
+                    sprintf(txt, "%d", grille[i][j]);
                     afficherTexte(renderer, font, txt, j * CELL + CELL / 2, i * CELL + CELL / 2 + 100);
                 }
             }
@@ -174,12 +174,55 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 
         SDL_RenderPresent(renderer);
 
-        if (!mouvementPossible(g)) {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "2048", "Aucun mouvement possible", NULL);
+        if (!mouvementPossible(grille)) {
             if (highscore != lastScore) sauvegarderHighscore();
-            return;
+            int choix = gameOver(renderer, font);
+            if (choix == 1) { // Réessayer
+                jouer(renderer, font);
+            }
+            return; // Retour au menu
         }
 
         SDL_Delay(16);
     }
+}
+
+int gameOver(SDL_Renderer *r, TTF_Font *font) {
+    /*
+     * Affichage graphique de l'écran de game over
+     * Permet de choisir de réessayer ou de revenir au menu principal
+     * Retourne 1 pour réessayer, 0 pour le menu
+     */
+    int running = 1;
+    SDL_Event e;
+
+    SDL_Rect btnRetry = {100, 200, 200, 60};
+    SDL_Rect btnMenu = {100, 280, 200, 60};
+
+    while (running) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) return 0;
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int mx = e.button.x, my = e.button.y;
+                if (clique(mx, my, btnRetry)) return 1;
+                if (clique(mx, my, btnMenu)) return 0;
+            }
+        }
+
+        dessinerEtoiles(r);
+        dessinerPlanetes(r);
+
+        afficherTexte(r, font, "Game Over", 200, 100);
+
+        SDL_SetRenderDrawColor(r, 50, 50, 50, 150);
+        SDL_RenderFillRect(r, &btnRetry);
+        SDL_RenderFillRect(r, &btnMenu);
+
+        afficherTexte(r, font, "Reessayer", 200, 260);
+        afficherTexte(r, font, "Menu", 200, 340);
+
+        SDL_RenderPresent(r);
+        SDL_Delay(16);
+    }
+    return 0;
 }

@@ -132,7 +132,7 @@ void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char 
     int i = 0;
     char *ligne = strtok(texteCopy, "\n");
     while (ligne) {
-        afficherTexte(renderer, font, ligne, x, y + i * ligneY + 4);
+        afficherTexte(renderer, font, ligne, x, i * ligneY + 4);
         ligne = strtok(NULL, "\n");
         i++;
     }
@@ -144,4 +144,20 @@ int clique(int mx, int my, SDL_Rect r) {
      * Retourne 1 si le clic (mx, my) est dans le rectangle r, sinon 0
      */
     return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
+}
+
+void dessinerGrille(SDL_Renderer *renderer, TTF_Font *font, int grille[4][4], int offsetX, int offsetY) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            SDL_Color c = colorForValue(grille[i][j]);
+            SDL_Rect r = {j * CELL + 5 + offsetX, i * CELL + 5 + 100 + offsetY, CELL - 10, CELL - 10};
+            SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+            SDL_RenderFillRect(renderer, &r);
+            if (grille[i][j] != 0) {
+                char txt[16];
+                sprintf(txt, "%d", grille[i][j]);
+                afficherTexte(renderer, font, txt, j * CELL + CELL / 2 + offsetX, i * CELL + CELL / 2 + 100 + offsetY);
+            }
+        }
+    }
 }

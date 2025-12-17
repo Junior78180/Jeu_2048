@@ -59,6 +59,7 @@ int main() {
         if (choix == -1) break;
         if (choix == 0) instructions(renderer, font);
         if (choix == 1) jouer(renderer, font);
+        if (choix == 2) gameOver(renderer, font);
     }
 
     if (musique) {
