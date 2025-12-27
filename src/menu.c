@@ -116,6 +116,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
      * Affichage graphique de la partie en cours
      */
     int grille[4][4] = {0}, old[4][4];
+    SDL_Rect btnMenu = {15, 25, 80, 60};
     chargerHighscore();
     score = 0;
     int lastScore = highscore;
@@ -146,6 +147,10 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
                 }
                 if (memcmp(grille, old, sizeof grille) != 0) ajouterTuile(grille); //
             }
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int mx = e.button.x, my = e.button.y;
+                if (clique(mx, my, btnMenu)) return;
+            }
         }
 
         sprintf(txtScore, "Score: %d", score);
@@ -154,7 +159,9 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 
         dessinerEtoiles(renderer);
         dessinerPlanetes(renderer);
+        SDL_RenderFillRect(renderer, &btnMenu);
 
+        afficherTexte(renderer, font, "Retour", 55, 55);
         afficherTexte(renderer, font, txtScore, WIDTH / 2, 30);
         afficherTexte(renderer, font, txtHighscore, WIDTH / 2, 80);
 
