@@ -6,5 +6,6 @@
 #define CELL  (WIDTH/4)
 #define STARS 150
 #define PLANETES 5
+#define MAX_PARTICULES 1000
 
 #endif

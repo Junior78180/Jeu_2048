@@ -5,6 +5,7 @@
 
 static Etoile etoiles[STARS];
 static Planete planetes[PLANETES];
+static Particule particules[MAX_PARTICULES];
 
 void initialiserEtoiles() {
     /*
@@ -144,4 +145,48 @@ int clique(int mx, int my, SDL_Rect r) {
      * Retourne 1 si le clic (mx, my) est dans le rectangle r, sinon 0
      */
     return mx >= r.x && mx <= r.x + r.w && my >= r.y && my <= r.y + r.h;
+}
+
+void creerExplosion(int x, int y, SDL_Color couleur) {
+    /*
+     * Crée une explosion de particules à la position (x, y) avec la couleur spécifiée
+     */
+    for (int i = 0; i < 20; i++) {
+        int index = -1;
+        for (int j = 0; j < MAX_PARTICULES; j++) {
+            if (particules[j].vie <= 0) {
+                index = j;
+                break;
+            }
+        }
+        if (index != -1) {
+            particules[index].x = x;
+            particules[index].y = y;
+            float angle = (rand() % 360) * M_PI / 180.0f;
+            // Vitesse réduite pour ralentir l'explosion
+            float vitesse = 1.0f + (rand() % 100) / 100.0f;
+            particules[index].vx = cos(angle) * vitesse;
+            particules[index].vy = sin(angle) * vitesse;
+            particules[index].vie = 60 + rand() % 40;
+            particules[index].couleur = couleur;
+        }
+    }
+}
+
+void mettreAJourEtDessinerParticules(SDL_Renderer *r) {
+    /*
+     * Met à jour la position et la vie des particules, puis les dessine
+     */
+    for (int i = 0; i < MAX_PARTICULES; i++) {
+        if (particules[i].vie > 0) {
+            particules[i].x += particules[i].vx;
+            particules[i].y += particules[i].vy;
+            particules[i].vie--;
+
+            SDL_SetRenderDrawColor(r, particules[i].couleur.r, particules[i].couleur.g, particules[i].couleur.b, (Uint8)(particules[i].vie * 10));
+            // Particules agrandies (6x6)
+            SDL_Rect rect = {(int)particules[i].x, (int)particules[i].y, 4, 4};
+            SDL_RenderFillRect(r, &rect);
+        }
+    }
 }

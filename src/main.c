@@ -49,9 +49,10 @@ int main() {
     }
 
     // Charger et jouer la musique de fond
-    Mix_Music *musique = Mix_LoadMUS("musics/Interstellar_Main_Theme_Extra_Extended_Soundtrack_by_Hans_Zimmer.mp3");
+    Mix_Music *musique = Mix_LoadMUS("musics/Updated_Summoners_Rift_Complete_Soundtrack.mp3");
     if (musique) {
         Mix_PlayMusic(musique, -1);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 10);
     }
 
     while (1) {

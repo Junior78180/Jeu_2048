@@ -3,6 +3,7 @@
 #include "game.h"
 #include <stdio.h>
 #include <string.h>
+#include <SDL_mixer.h> // Nécessaire pour gérer l'audio
 
 int menu(SDL_Renderer *r, TTF_Font *font) {
     /*
@@ -111,12 +112,13 @@ int instructions(SDL_Renderer *r, TTF_Font *font) {
     return -1;
 }
 
+
 void jouer(SDL_Renderer *renderer, TTF_Font *font) {
     /*
      * Affichage graphique de la partie en cours
      */
     int grille[4][4] = {0}, old[4][4];
-    SDL_Rect btnMenu = {15, 25, 80, 60};
+    SDL_Rect btnRetour = {15, 25, 80, 60};
     chargerHighscore();
     score = 0;
     int lastScore = highscore;
@@ -145,11 +147,11 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
                         if (highscore != lastScore) sauvegarderHighscore();
                         return;
                 }
-                if (memcmp(grille, old, sizeof grille) != 0) ajouterTuile(grille); //
+                if (memcmp(grille, old, sizeof grille) != 0) ajouterTuile(grille);
             }
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int mx = e.button.x, my = e.button.y;
-                if (clique(mx, my, btnMenu)) return;
+                if (clique(mx, my, btnRetour)) return;
             }
         }
 
@@ -159,7 +161,7 @@ void jouer(SDL_Renderer *renderer, TTF_Font *font) {
 
         dessinerEtoiles(renderer);
         dessinerPlanetes(renderer);
-        SDL_RenderFillRect(renderer, &btnMenu);
+        SDL_RenderFillRect(renderer, &btnRetour);
 
         afficherTexte(renderer, font, "Retour", 55, 55);
         afficherTexte(renderer, font, txtScore, WIDTH / 2, 30);
@@ -202,34 +204,76 @@ int gameOver(SDL_Renderer *r, TTF_Font *font) {
      */
     int running = 1;
     SDL_Event e;
+    int ret = 0;
 
     SDL_Rect btnRetry = {100, 200, 200, 60};
     SDL_Rect btnMenu = {100, 280, 200, 60};
 
+
+    Mix_PauseMusic();
+
+    Mix_Chunk *snd_game_over = Mix_LoadWAV("musics/LeagueOfLegendsDefeat.mp3");
+    int channel = -1;
+    if (snd_game_over) {
+        channel = Mix_PlayChannel(-1, snd_game_over, 0);
+        Mix_Volume(channel, MIX_MAX_VOLUME / 2);
+    }
+
+    // Variable pour gérer le délai de l'explosion
+    Uint32 startTime = SDL_GetTicks();
+    int explosionDeclenchee = 0;
+
     while (running) {
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) return 0;
+            if (e.type == SDL_QUIT) {
+                if (snd_game_over) Mix_FreeChunk(snd_game_over);
+                Mix_ResumeMusic();
+                return 0;
+            }
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int mx = e.button.x, my = e.button.y;
-                if (clique(mx, my, btnRetry)) return 1;
-                if (clique(mx, my, btnMenu)) return 0;
+                if (clique(mx, my, btnRetry)) {
+                    running = 0;
+                    ret = 1;
+                    break;
+                }
+                if (clique(mx, my, btnMenu)) {
+                    running = 0;
+                    ret = 0;
+                    break;
+                }
             }
+        }
+
+        // Déclencher l'explosion après 2 secondes (2000 ms)
+        if (!explosionDeclenchee && SDL_GetTicks() - startTime >= 4750) {
+            creerExplosion(WIDTH / 2, HEIGHT / 2, (SDL_Color){255, 100, 50, 255});
+            explosionDeclenchee = 1;
         }
 
         dessinerEtoiles(r);
         dessinerPlanetes(r);
+        mettreAJourEtDessinerParticules(r); // Mise à jour et dessin des particules
 
-        afficherTexte(r, font, "Game Over", 200, 100);
+        afficherTexte(r, font, "Defeat !", 200, 100);
 
         SDL_SetRenderDrawColor(r, 50, 50, 50, 150);
         SDL_RenderFillRect(r, &btnRetry);
         SDL_RenderFillRect(r, &btnMenu);
 
-        afficherTexte(r, font, "Reessayer", 200, 260);
-        afficherTexte(r, font, "Menu", 200, 340);
+        afficherTexte(r, font, "Reessayer", 200, 230);
+        afficherTexte(r, font, "Menu", 200, 310);
 
         SDL_RenderPresent(r);
         SDL_Delay(16);
     }
-    return 0;
+
+    if (snd_game_over) {
+        Mix_HaltChannel(channel);
+        Mix_FreeChunk(snd_game_over);
+    }
+
+    Mix_ResumeMusic();
+
+    return ret;
 }

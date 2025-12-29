@@ -7,6 +7,7 @@
 
 typedef struct { float x, y, vitesse; int taille; } Etoile;
 typedef struct { float x, y, vitesse; int taille; SDL_Color couleur; } Planete;
+typedef struct { float x, y, vx, vy; int vie; SDL_Color couleur; } Particule;
 
 void initialiserEtoiles(void);
 void initialiserPlanetes(void);
@@ -18,5 +19,8 @@ void afficherTexte(SDL_Renderer *renderer, TTF_Font *font, const char *texte, in
 void afficherTexteMultiligne(SDL_Renderer *renderer, TTF_Font *font, const char *texte, int x, int y);
 SDL_Color colorForValue(int v);
 int clique(int mx, int my, SDL_Rect r);
+
+void creerExplosion(int x, int y, SDL_Color couleur);
+void mettreAJourEtDessinerParticules(SDL_Renderer *r);
 
 #endif // RENDER_H
